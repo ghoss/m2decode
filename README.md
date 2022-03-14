@@ -1,9 +1,9 @@
 # Lilith Modula-2 M-Code Disassembler
-This is a disassembler (written in C) to decode Modula-2 M-Code in Lilith object (.OBJ) files.
+This is a disassembler (written in C) to decode Lilith M-Code object (.OBJ) files.
 
-It is derived from Niklaus Wirth's original decoder which he wrote in 1984 for the Modula-2 Single Pass Compiler. The source code for this compiler, along with the original Modula-2 sources for the decoder, were discovered in 2021.
+It is derived from Niklaus Wirth's original decoder which he wrote in 1984 for the Modula-2 Single Pass Compiler. The source code for this compiler, along with the original Modula-2 sources for the decoder, was discovered in 2021.
 
-The 1984 version of the decoder is significantly less complex than an earlier version written by Ch. Jacobi in 1981 for the Modula-2 Multipass Compiler.
+The 1984 version of the decoder is somewhat less complex than an earlier version written by Ch. Jacobi in 1981 for the Modula-2 Multipass Compiler.
 
 ## Caveat
 This code is still work in progress. It will already run on many object files, but will not produce the correct output for most of them yet.
