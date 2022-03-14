@@ -51,105 +51,116 @@ void md_expect(FILE *infd, uint16_t w)
 //
 void md_decode_file(FILE *infd, FILE *ofd)
 {
-    uint16_t w;
+    uint16_t w, n, a;
     uint16_t vers;
+    bool proc_section = true;
+    bool eof = false;
 
-    md_expect(infd, 0200);
-    md_expect(infd, 1);
-    w = md_rword(infd);
+    // Parse all sections
+    while (! eof) {
 
-    // Header section
-    md_expect(infd, 0201);
-    vers = md_rword(infd);
-    fprintf(ofd, "HEADER\n");
-    md_rname(infd, ofd);
-
-    // Skip bytes following filename in later versions
-    if (vers == 0x11)
-        md_skip(infd, 6);
-
-    w = md_rword(infd);
-    fprintf(ofd, "\n  DataSize: %07o (%d)", w, w);
-    w = md_rword(infd);
-    fprintf(ofd, "\n  CodeSize: %07o (%d)\n\n", w, w);
-    md_rword(infd);
-
-    // Import section
-    w = md_rword(infd);
-    if (w == 0202)
-    {
-        fprintf(ofd, "IMPORTS\n");
-        uint16_t n = md_rword(infd);
-        while (n > 0)
-        {
-            md_rname(infd, ofd);
-            n -= 11;
-        }
+        // Read next word
         w = md_rword(infd);
-        fprintf(ofd, "\n");
-    }
+        eof = feof(infd);
 
-    // Data sections
-    while (w == 0204)
-    {
-        fprintf(ofd, "DATA\n");
-        uint16_t n = md_rword(infd);
-        uint16_t a = md_rword(infd);
-        while (n-- > 1)
+        switch (w)
         {
-            fprintf(ofd, "%7d: %07o\n", a++, md_rword(infd));
-        }
-        w = md_rword(infd);
-        fprintf(ofd, "\n");
-    }
-
-    // Entries section
-    if (w == 0203)
-    {
-        fprintf(ofd, "PROCEDURES\n");
-        uint16_t n = md_rword(infd);
-        uint16_t a = 0;
-
-        md_rword(infd);
-        // md_expect(infd, 0);
-        while (n-- > 1)
-        {
-            fprintf(ofd, "%7d: %07o\n", a, md_rword(infd));
-            a ++;
-        }
-        w = md_rword(infd);
-        fprintf(ofd, "\n");
-    }
-
-    // Code section
-    if (w == 0203)
-    {
-        fprintf(ofd, "CODE\n");
-        uint16_t n = md_rword(infd);
-        uint16_t a = md_rword(infd);
+        case 0200 :
+            // Start of file
+            md_expect(infd, 1);
+            md_rword(infd);
+            break;
         
-        n = (a + n - 1) << 1;
-        a <<= 1;
-        while (a < n)
-        {
-            fprintf(ofd, "  %07o  ", a);
-            a += md_opcode(infd, ofd, md_rbyte(infd));
-        }
-        w = md_rword(infd);
-        fprintf(ofd, "\n");
-    }
+        case 0201 :
+            // Header section
+            vers = md_rword(infd);
+            fprintf(ofd, "HEADER (v.%d)\n", vers);
+            md_rname(infd, ofd);
 
-    // Relocation section
-    if (w == 0205)
-    {
-        fprintf(ofd, "RELOCATION\n");
-        uint16_t n = md_rword(infd);
+            // Skip bytes following filename in later versions
+            if (vers == 0x11)
+                md_skip(infd, 6);
 
-        while (n-- > 0)
-        {
-            uint16_t w = md_rword(infd);
-            fprintf(ofd, "  %07o\n", w);
+            w = md_rword(infd);
+            fprintf(ofd, "\n  DataSize: %07o (%d)", w, w);
+            w = md_rword(infd);
+            fprintf(ofd, "\n  CodeSize: %07o (%d)\n\n", w, w);
+            md_rword(infd);
+            break;
+
+        case 0202 :
+            // Import section
+            fprintf(ofd, "IMPORTS\n");
+            n = md_rword(infd);
+            while (n > 0)
+            {
+                md_rname(infd, ofd);
+                n -= 11;
+            }
+            break;
+
+        case 0204 :
+            // Data sections
+            fprintf(ofd, "DATA [G]\n");
+            n = md_rword(infd);
+            a = md_rword(infd);
+            while (n-- > 1)
+            {
+                fprintf(ofd, "%7d: %07o\n", a++, md_rword(infd));
+            }
+            break;
+
+        case 0203 :
+            if (proc_section)
+            {
+                // Procedure entry point section
+                n = md_rword(infd);
+                a = 0;
+                w = md_rword(infd);
+
+                fprintf(ofd, "PROCEDURES [F,%03o]\n", w);
+                while (n-- > 1)
+                {
+                    fprintf(ofd, "%7d: %07o\n", a, md_rword(infd));
+                    a ++;
+                }
+            }
+            else {
+                n = md_rword(infd);
+                a = md_rword(infd);
+                n = (a + n - 1) << 1;
+                a <<= 1;
+                fprintf(ofd, "CODE [F]\n");
+
+                while (a < n)
+                {
+                    fprintf(ofd, "  %07o  ", a);
+                    a += md_opcode(infd, ofd, md_rbyte(infd));
+                }
+            }
+            proc_section = ! proc_section;
+            break;
+
+        case 0205 :
+            // Relocation section
+            fprintf(ofd, "RELOCATION\n");
+            n = md_rword(infd);
+
+            while (n-- > 0)
+            {
+                w = md_rword(infd);
+                fprintf(ofd, "  %07o\n", w);
+            }
+            break;
+
+        default :
+            // No more readable sections
+            eof = true;
+            break;
         }
-        fprintf(ofd, "\n");
-    }
+
+        // End of section
+        if (! eof)
+            fprintf(ofd, "\n");
+    };
 }
