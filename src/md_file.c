@@ -69,9 +69,9 @@ void md_decode_file(FILE *infd, FILE *ofd)
         md_skip(infd, 6);
 
     w = md_rword(infd);
-    fprintf(ofd, "\n  DataSize: %oB (%d)", w, w);
+    fprintf(ofd, "\n  DataSize: %07o (%d)", w, w);
     w = md_rword(infd);
-    fprintf(ofd, "\n  CodeSize: %oB (%d)\n\n", w, w);
+    fprintf(ofd, "\n  CodeSize: %07o (%d)\n\n", w, w);
     md_rword(infd);
 
     // Import section
@@ -106,7 +106,7 @@ void md_decode_file(FILE *infd, FILE *ofd)
     // Entries section
     if (w == 0203)
     {
-        fprintf(ofd, "ENTRIES\n");
+        fprintf(ofd, "PROCEDURES\n");
         uint16_t n = md_rword(infd);
         uint16_t a = 0;
 
@@ -115,7 +115,7 @@ void md_decode_file(FILE *infd, FILE *ofd)
         while (n-- > 1)
         {
             fprintf(ofd, "%7d: %07o\n", a, md_rword(infd));
-            a += 2;
+            a ++;
         }
         w = md_rword(infd);
         fprintf(ofd, "\n");
