@@ -34,8 +34,8 @@ object_file is the filename of a Lilith M-Code (OBJ) file.
 ## Examples
 * ```mdec test.OBJ```
 
-  Decodes the object file **test.OBJ** and writes the disassembled result to standard output.
+  Decodes the object file `test.OBJ` and writes the disassembled result to standard output.
 
 * ```mdec -o test.txt test.OBJ```
 
-  As above, but writes the output to the file **test.txt** instead.
+  As above, but writes the output to the file `test.txt` instead.
