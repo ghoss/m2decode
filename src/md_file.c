@@ -82,9 +82,9 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 md_skip(infd, 6);
 
             w = md_rword(infd);
-            fprintf(ofd, "\n  DataSize: %07o (%d)", w, w);
+            fprintf(ofd, "\n  DataSize: %07o (%d bytes)", w, w);
             w = md_rword(infd);
-            fprintf(ofd, "\n  CodeSize: %07o (%d)\n\n", w, w);
+            fprintf(ofd, "\n  CodeSize: %07o (%d bytes)\n\n", w, w);
             md_rword(infd);
             break;
 
