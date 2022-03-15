@@ -13,6 +13,6 @@
 
 #include "mdecode.h"
 
-uint8_t md_opcode(FILE *infd, FILE *ofd, uint8_t w);
+uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode);
 
 #endif

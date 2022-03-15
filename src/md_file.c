@@ -134,8 +134,8 @@ void md_decode_file(FILE *infd, FILE *ofd)
 
                 while (a < n)
                 {
-                    fprintf(ofd, "  %07o  ", a);
-                    a += md_opcode(infd, ofd, md_rbyte(infd));
+                    uint16_t ofs = md_opcode(infd, ofd, a, md_rbyte(infd));
+                    a += ofs;
                 }
             }
             proc_section = ! proc_section;

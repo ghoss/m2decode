@@ -15,6 +15,8 @@
 
 // M-Code mnemonics table
 //
+#define MD_MNEMLEN  5
+
 char *mnem = 
 	"LI0  LI1  LI2  LI3  LI4  LI5  LI6  LI7  LI8  LI9  LI10 LI11 LI12 LI13 LI14 LI15 "
 	"LIB +---- LIW *LID /LLA +LGA +LSA +LEA *JPC *JP  *JPFC+JPF +JPBC+JPB +ORJP+AJP +"
@@ -38,30 +40,44 @@ char *mnem =
 // Print an opcode and its arguments
 // Return the number of bytes consumed by the opcode
 //
-uint8_t md_opcode(FILE *infd, FILE *ofd, uint8_t w)
+uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
 {
-    uint8_t ofs = 1;
+    uint16_t a1;
+    uint16_t ofs = 1;
 
-    void pr_byte()
+    // Print octal byte
+    uint8_t pr_byte()
     {
-        fprintf(ofd, " %03o", md_rbyte(infd));
-        ofs += 1;
+        uint8_t byt = md_rbyte(infd);
+        fprintf(ofd, " %03o", byt);
+        ofs ++;
+        return byt;
     }
 
-    void pr_word()
+    // Print octal word
+    uint16_t pr_word()
     {
-        fprintf(ofd, " %06o", md_rword(infd));
+        uint16_t wrd = md_rword(infd);
+        fprintf(ofd, " %06o", wrd);
         ofs += 2;
+        return wrd;
     }
 
-    uint16_t i = w * 5;
-    char c = mnem[i + 4];
-    fprintf(ofd, " %c%c%c%c", mnem[i], mnem[i+1], mnem[i+2], mnem[i+3]);
+    // Output mnemonic
+    uint16_t i = mcode * MD_MNEMLEN;
+    char c = mnem[i + (MD_MNEMLEN - 1)];
+    fprintf(ofd, 
+        "  %07o  %c%c%c%c", 
+        pc, mnem[i], mnem[i+1], mnem[i+2], mnem[i+3]
+    );
+    pc ++;
 
+    // Output parameters of opcode (type indicated by one-character
+    // code following mnemonic in table)
     switch (c)
     {
         case '+' :
-            pr_byte();
+            a1 = (int8_t) pr_byte();
             break;
 
         case '-' :
@@ -70,7 +86,7 @@ uint8_t md_opcode(FILE *infd, FILE *ofd, uint8_t w)
             break;
 
         case '*' :
-            pr_word();
+            a1 = (int16_t) pr_word();
             break;
 
         case '/' :
@@ -84,9 +100,27 @@ uint8_t md_opcode(FILE *infd, FILE *ofd, uint8_t w)
             break;
 
         default :
+            // No special type -> print last character of opcode
             fprintf(ofd, "%c", c);
             break;
     }
+
+    // Special formatting for some opcodes
+    // Jumps: print offset previously fetched in a1
+    switch (mcode)
+    {
+        case 030 ... 033 :
+        case 036 ... 037 :
+            // Forward jumps
+            fprintf(ofd, "\t->[%o]", pc + a1);
+            break;
+
+        case 034 ... 035 :
+            // Backward jumps
+            fprintf(ofd, "\t<-[%o]", pc - a1);
+            break;
+    }
+
     fprintf(ofd, "\n");
     return ofs;
 }
