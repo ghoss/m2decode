@@ -11,7 +11,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.71])
-AC_INIT([mdecode], [0.1], [])
+AC_INIT([mdecode], [0.2], [])
 AM_INIT_AUTOMAKE([-Werror foreign subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 
