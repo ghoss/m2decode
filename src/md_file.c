@@ -52,6 +52,8 @@ void md_decode_file(FILE *infd, FILE *ofd)
 {
     uint16_t w, n, a;
     uint16_t vers;
+    uint32_t totalCode = 0;     // effective code size
+    uint32_t declCode = 0;      // declared code size
     bool proc_section = true;
     bool eof = false;
 
@@ -81,9 +83,12 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 md_skip(infd, 6);
 
             w = md_rword(infd);
-            fprintf(ofd, "\n  DataSize: %07o (%d bytes)", w, w);
-            w = md_rword(infd);
-            fprintf(ofd, "\n  CodeSize: %07o (%d bytes)\n", w, w);
+            declCode += md_rword(infd) << 1;
+            fprintf(ofd, 
+                "\n  DataSize: %6d bytes\n"
+                "  CodeSize: %6d bytes\n", 
+                w, declCode
+            );
             md_rword(infd);
             break;
 
@@ -120,7 +125,17 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 a = 0;
                 w = md_rword(infd);
 
-                fprintf(ofd, "PROCEDURE #%03o\n", w);
+                fprintf(ofd, "PROCEDURE #%03o", w);
+                if (n > 2)
+                {
+                    uint16_t extra = (n - 2) * 2;
+                    fprintf(ofd, 
+                        "  (%d bytes for extra entries)", extra
+                    );
+                    totalCode += (n - 2) * 2;
+                }
+                fprintf(ofd, "\n");
+
                 while (n-- > 1)
                 {
                     fprintf(ofd, "%7d: %07o\n", a, md_rword(infd));
@@ -128,17 +143,17 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 }
             }
             else {
-                n = md_rword(infd);
-                a = md_rword(infd);
-                n = (a + n - 1) << 1;
-                a <<= 1;
-                fprintf(ofd, "CODE [F]\n");
+                n = md_rword(infd) << 1;
+                a = md_rword(infd) << 1;
+                fprintf(ofd, "CODE (%d bytes)\n", n);
+                totalCode += n;
+                n = a + n - 2;
 
                 while (a < n)
                 {
                     uint16_t ofs = md_opcode(infd, ofd, a, md_rbyte(infd));
                     a += ofs;
-                }
+                };
             }
             proc_section = ! proc_section;
             break;
@@ -165,4 +180,11 @@ void md_decode_file(FILE *infd, FILE *ofd)
         if (! eof)
             fprintf(ofd, "\n");
     };
+
+    // Final stats
+    fprintf(ofd,
+        "CODESIZE STATS\n" 
+        "  Declared:  %6d bytes\n  Effective: %6d bytes\n",
+        declCode, totalCode
+    );
 }
