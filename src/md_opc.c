@@ -109,15 +109,16 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
     // Jumps: print offset previously fetched in a1
     switch (mcode)
     {
-        case 030 ... 033 :
-        case 036 ... 037 :
-            // Forward jumps
-            fprintf(ofd, "\t->[%o]", pc + a1);
-            break;
-
-        case 034 ... 035 :
-            // Backward jumps
-            fprintf(ofd, "\t<-[%o]", pc - a1);
+        case 030 ... 037 :
+            if (mcode == 034)
+            {
+                // JPBC
+                a1 = -a1;
+            }
+            fprintf(ofd, "\t%s[%o]",
+                (a1 < 0) ? "<-" : "->",
+                pc + (int16_t) a1
+            );
             break;
     }
 

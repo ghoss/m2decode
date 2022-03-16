@@ -18,7 +18,6 @@
 //
 void md_rname(FILE *infd, FILE *ofd)
 {
-    fprintf(ofd, "  ");
     for (int i = 0; i < 16; i ++)
     {
         char c = md_rbyte(infd);
@@ -72,9 +71,9 @@ void md_decode_file(FILE *infd, FILE *ofd)
             break;
         
         case 0201 :
-            // Header section
+            // Module section
             vers = md_rword(infd);
-            fprintf(ofd, "HEADER (v.%d)\n", vers);
+            fprintf(ofd, "MODULE ");
             md_rname(infd, ofd);
 
             // Skip bytes following filename in later versions
@@ -84,7 +83,7 @@ void md_decode_file(FILE *infd, FILE *ofd)
             w = md_rword(infd);
             fprintf(ofd, "\n  DataSize: %07o (%d bytes)", w, w);
             w = md_rword(infd);
-            fprintf(ofd, "\n  CodeSize: %07o (%d bytes)\n\n", w, w);
+            fprintf(ofd, "\n  CodeSize: %07o (%d bytes)\n", w, w);
             md_rword(infd);
             break;
 
@@ -92,10 +91,13 @@ void md_decode_file(FILE *infd, FILE *ofd)
             // Import section
             fprintf(ofd, "IMPORTS\n");
             n = md_rword(infd);
+            a = 1;
             while (n > 0)
             {
+                fprintf(ofd, "  %03o: ", a);
                 md_rname(infd, ofd);
                 n -= 11;
+                a++;
             }
             break;
 
@@ -118,7 +120,7 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 a = 0;
                 w = md_rword(infd);
 
-                fprintf(ofd, "PROCEDURES [F,%03o]\n", w);
+                fprintf(ofd, "PROCEDURE #%03o\n", w);
                 while (n-- > 1)
                 {
                     fprintf(ofd, "%7d: %07o\n", a, md_rword(infd));
@@ -143,7 +145,7 @@ void md_decode_file(FILE *infd, FILE *ofd)
 
         case 0205 :
             // Relocation section
-            fprintf(ofd, "RELOCATION\n");
+            fprintf(ofd, "FIXUPS\n");
             n = md_rword(infd);
 
             while (n-- > 0)
