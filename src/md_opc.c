@@ -43,6 +43,7 @@ char *mnem =
 uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
 {
     uint16_t a1;
+    uint8_t b1;
     uint16_t ofs = 1;
 
     // Print octal byte
@@ -67,8 +68,8 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
     uint16_t i = mcode * MD_MNEMLEN;
     char c = mnem[i + (MD_MNEMLEN - 1)];
     fprintf(ofd, 
-        "  %07o  %c%c%c%c", 
-        pc, mnem[i], mnem[i+1], mnem[i+2], mnem[i+3]
+        "  %07o  %03o  %c%c%c%c", 
+        pc, mcode, mnem[i], mnem[i+1], mnem[i+2], mnem[i+3]
     );
     pc ++;
 
@@ -95,8 +96,8 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
             break;
 
         case '?' :
-            pr_byte();
-            pr_word();
+            b1 = pr_byte();
+            a1 = pr_word();
             break;
 
         default :
@@ -109,15 +110,31 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
     // Jumps: print offset previously fetched in a1
     switch (mcode)
     {
-        case 030 ... 037 :
-            if (mcode == 034)
-            {
-                // JPBC
-                a1 = -a1;
-            }
-            fprintf(ofd, "\t%s[%o]",
-                (a1 < 0) ? "<-" : "->",
-                pc + (int16_t) a1
+        case 034 ... 035 :
+            // JPB, JPBC
+            fprintf(ofd, "\t<-[%o]", pc - (int16_t) a1);
+            break;
+            
+        case 030 ... 033 :
+        case 036 ... 037 :
+            // Forward jumps
+            fprintf(ofd, "\t->[%o]", pc + (int16_t) a1);
+            break;
+
+        case 0300 :
+            // FOR1
+            fprintf(ofd, 
+                "\t->[%o] %s",
+                pc + (int16_t) a1 - 3,
+                (b1 == 0) ? "UP" : "DN"
+            );
+            break;
+
+        case 0301 :
+            // FOR2
+            fprintf(ofd, 
+                "\t->[%o]",
+                pc + (int16_t) a1 - 3
             );
             break;
     }
