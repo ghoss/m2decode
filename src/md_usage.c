@@ -9,7 +9,7 @@
 // Published by Guido Hoss under GNU Public License V3.
 //=====================================================
 
-#include "mdecode.h"
+#include "md_usage.h"
 
 
 // md_version()

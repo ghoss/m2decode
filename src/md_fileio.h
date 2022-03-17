@@ -8,8 +8,8 @@
 // Published by Guido Hoss under GNU Public License V3.
 //=====================================================
 
-#ifndef _MDFILEIO_H
-#define _MDFILEIO_H   1
+#ifndef _MD_FILEIO_H
+#define _MD_FILEIO_H   1
 
 #include "mdecode.h"
 

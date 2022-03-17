@@ -13,12 +13,6 @@
 #define _MDECODE_H   1
 
 #include <config.h>
-
-#ifndef VERSION_BUILD_DATE
-#define VERSION_BUILD_DATE "?"
-#endif
-#define PKG "mdec"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

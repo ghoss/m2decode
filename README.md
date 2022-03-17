@@ -9,11 +9,11 @@ The 1984 version of the decoder is somewhat less complex than an earlier version
 This code is still work in progress. It will already run on most object files, but may not produce the correct output for some of them yet.
 
 ## Compiling And Installation
-1. Download the .tar.gz packages from the "[Releases](https://github.com/good-sushi/mdecode/releases)" page.
+1. Download the .tar.gz packages from the "[Releases](https://github.com/good-sushi/m2decode/releases)" page.
 2. Extract and build:
     ```
-    $ tar xzf mdecode-x.y.tar.gz
-    $ cd mdecode-x.y
+    $ tar xzf m2decode-x.y.tar.gz
+    $ cd m2decode-x.y
     $ ./configure
     $ make && make install
     ```

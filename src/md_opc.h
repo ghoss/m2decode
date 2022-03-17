@@ -8,8 +8,8 @@
 // Published by Guido Hoss under GNU Public License V3.
 //=====================================================
 
-#ifndef _MDOPC_H
-#define _MDOPC_H   1
+#ifndef _MD_OPC_H
+#define _MD_OPC_H   1
 
 #include "mdecode.h"
 
