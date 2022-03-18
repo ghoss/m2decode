@@ -68,6 +68,11 @@ void md_decode_file(FILE *infd, FILE *ofd)
 
         switch (w)
         {
+        case 0xC1 :
+            // Alternate start of file, sometimes encountered
+            md_rword(infd);
+            break;
+
         case 0200 : {
             // Start of file
             md_expect(infd, 1);
