@@ -112,7 +112,7 @@ void md_decode_file(FILE *infd, FILE *ofd)
             a = 1;
             while (n > 0)
             {
-                fprintf(ofd, "  %03o: ", a);
+                fprintf(ofd, "%4d: ", a);
                 md_rname(infd, ofd);
                 n -= 11;
                 a++;
