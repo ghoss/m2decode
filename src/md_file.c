@@ -68,31 +68,37 @@ void md_decode_file(FILE *infd, FILE *ofd)
 
         switch (w)
         {
-        case 0200 :
+        case 0200 : {
             // Start of file
             md_expect(infd, 1);
-            md_rword(infd);
-            break;
-        
-        case 0201 :
-            // Module section
             vers = md_rword(infd);
-            fprintf(ofd, "MODULE ");
+            fprintf(ofd, "HEADER v.%d", vers);
+            break;
+        }
+        
+        case 0201 : {
+            // Module section
+            n = md_rword(infd);
+            fprintf(ofd, "MODULE (%d bytes): ", n << 1);
             md_rname(infd, ofd);
 
             // Skip bytes following filename in later versions
-            if (vers == 0x11)
+            if (n == 0x11)
                 md_skip(infd, 6);
 
-            decl_data += md_rword(infd) << 1;
-            decl_code += md_rword(infd) << 1;
+            uint16_t nd = md_rword(infd) << 1;
+            uint16_t nc = md_rword(infd) << 1;
+            decl_data += nd;
+            decl_code += nc;
+
             fprintf(ofd, 
                 "\n  DataSize: %6d bytes\n"
                 "  CodeSize: %6d bytes\n", 
-                decl_data, decl_code
+                nd, nc
             );
             md_rword(infd);
             break;
+        }
 
         case 0202 :
             // Import section
@@ -114,7 +120,8 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 a = md_rword(infd);
                 n --;
                 fprintf(ofd, "DATA (%d bytes)\n", n << 1);
-				total_data += (n + 1) << 1;
+				total_data += n << 1;
+
                 uint16_t num = 0;
                 while (n-- > 0)
                 {
