@@ -17,4 +17,4 @@ mdec_SOURCES = \
 	md_file.c md_file.h \
 	md_fileio.c md_fileio.h \
 	md_opc.c md_opc.h \
-	mdecode.h
+	mdecode.c mdecode.h

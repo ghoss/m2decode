@@ -109,7 +109,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_mdec_OBJECTS = md_main.$(OBJEXT) md_usage.$(OBJEXT) \
-	md_file.$(OBJEXT) md_fileio.$(OBJEXT) md_opc.$(OBJEXT)
+	md_file.$(OBJEXT) md_fileio.$(OBJEXT) md_opc.$(OBJEXT) \
+	mdecode.$(OBJEXT)
 mdec_OBJECTS = $(am_mdec_OBJECTS)
 mdec_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -129,7 +130,7 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/md_file.Po ./$(DEPDIR)/md_fileio.Po \
 	./$(DEPDIR)/md_main.Po ./$(DEPDIR)/md_opc.Po \
-	./$(DEPDIR)/md_usage.Po
+	./$(DEPDIR)/md_usage.Po ./$(DEPDIR)/mdecode.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -263,7 +264,7 @@ mdec_SOURCES = \
 	md_file.c md_file.h \
 	md_fileio.c md_fileio.h \
 	md_opc.c md_opc.h \
-	mdecode.h
+	mdecode.c mdecode.h
 
 all: all-am
 
@@ -356,6 +357,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md_main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md_opc.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md_usage.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mdecode.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -510,6 +512,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/md_main.Po
 	-rm -f ./$(DEPDIR)/md_opc.Po
 	-rm -f ./$(DEPDIR)/md_usage.Po
+	-rm -f ./$(DEPDIR)/mdecode.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -560,6 +563,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/md_main.Po
 	-rm -f ./$(DEPDIR)/md_opc.Po
 	-rm -f ./$(DEPDIR)/md_usage.Po
+	-rm -f ./$(DEPDIR)/mdecode.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

@@ -16,19 +16,12 @@
 // md_rname()
 // Read a name string from input
 //
-void md_rname(FILE *infd, FILE *ofd)
+void md_rname(FILE *infd, char *modname)
 {
-    for (int i = 0; i < 16; i ++)
+    for (int i = 0; i < MODNAME_LEN - 1; i ++)
     {
-        char c = md_rbyte(infd);
-        fprintf(ofd, "%c", (c < ' ') ? ' ' : c);
+        *(modname + i) = md_rbyte(infd);
     }
-
-    fprintf(ofd, "  (");
-    for (int i = 0; i < 3; i ++)
-        fprintf(ofd, " %04X", md_rword(infd));
-
-    fprintf(ofd, " )\n");
 }
 
 
@@ -84,8 +77,14 @@ void md_decode_file(FILE *infd, FILE *ofd)
         case 0201 : {
             // Module section
             n = md_rword(infd);
-            fprintf(ofd, "MODULE (%d bytes): ", n << 1);
-            md_rname(infd, ofd);
+			char modname[MODNAME_LEN];
+            md_rname(infd, &modname[0]);
+            fprintf(ofd, "MODULE %s (%d bytes),", &modname, n << 1);
+
+			fprintf(ofd, " key = ");
+			for (int i = 0; i < 3; i ++)
+				fprintf(ofd, "%04X", md_rword(infd));
+			fprintf(ofd, "\n");
 
             // Skip bytes following filename in later versions
             if (n == 0x11)
@@ -109,11 +108,17 @@ void md_decode_file(FILE *infd, FILE *ofd)
             // Import section
             fprintf(ofd, "IMPORTS\n");
             n = md_rword(infd);
+			import_n = n;
             a = 1;
             while (n > 0)
             {
-                fprintf(ofd, "%4d: ", a);
-                md_rname(infd, ofd);
+                md_rname(infd, &(import[a][0]));
+                fprintf(ofd, "%4d: %-16s", a, &(import[a][0]));
+				fprintf(ofd, "  (");
+				for (int i = 0; i < 3; i ++)
+					fprintf(ofd, "%04X", md_rword(infd));
+				fprintf(ofd, ")\n");
+
                 n -= 11;
                 a++;
             }

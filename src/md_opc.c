@@ -42,8 +42,7 @@ char *mnem =
 //
 uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
 {
-    uint16_t a1;
-    uint8_t b1;
+    uint16_t a1, b1;
     uint16_t ofs = 1;
 
     // Print octal byte
@@ -82,8 +81,8 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
             break;
 
         case '-' :
-            pr_byte();
-            pr_byte();
+            a1 = pr_byte();
+            b1 = pr_byte();
             break;
 
         case '*' :
@@ -91,8 +90,8 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
             break;
 
         case '/' :
-            pr_word();
-            pr_word();
+            a1 = pr_word();
+            b1 = pr_word();
             break;
 
         case '?' :
@@ -112,20 +111,20 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
     {
         case 034 ... 035 :
             // JPB, JPBC
-            fprintf(ofd, "\t<-[%o]", pc - (int16_t) a1);
+            fprintf(ofd, "\t; <-[%o]", pc - (int16_t) a1);
             break;
             
         case 030 ... 033 :
         case 036 ... 037 :
             // Forward jumps
-            fprintf(ofd, "\t->[%o]", pc + (int16_t) a1);
+            fprintf(ofd, "\t; ->[%o]", pc + (int16_t) a1);
             break;
 
         case 0300 :
             // FOR1
             fprintf(ofd, 
-                "\t->[%o] %s",
-                pc + (int16_t) a1 - 3,
+                "\t; ->[%o] %s",
+                pc + (int8_t) (a1 & 0xff) - 3,
                 (b1 == 0) ? "UP" : "DN"
             );
             break;
@@ -133,10 +132,15 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
         case 0301 :
             // FOR2
             fprintf(ofd, 
-                "\t->[%o]",
-                pc + (int16_t) a1 - 3
+                "\t; ->[%o]",
+                pc + (int8_t) (a1 & 0xff) - 3
             );
             break;
+
+		case 0355 :
+			// CLX
+			fprintf(ofd, "\t; ->%s.%03o", import[a1], b1);
+			break;
     }
 
     fprintf(ofd, "\n");
