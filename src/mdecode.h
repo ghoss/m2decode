@@ -28,4 +28,7 @@
 extern char import[IMPORT_LEN][MODNAME_LEN];
 extern uint16_t import_n;
 
+// Output shorthand
+#define OUT(...)		fprintf(ofd, __VA_ARGS__);
+
 #endif

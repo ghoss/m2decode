@@ -49,7 +49,7 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
     uint8_t pr_byte()
     {
         uint8_t byt = md_rbyte(infd);
-        fprintf(ofd, " %03o", byt);
+        OUT(" %03o", byt)
         ofs ++;
         return byt;
     }
@@ -58,7 +58,7 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
     uint16_t pr_word()
     {
         uint16_t wrd = md_rword(infd);
-        fprintf(ofd, " %06o", wrd);
+        OUT(" %06o", wrd)
         ofs += 2;
         return wrd;
     }
@@ -66,10 +66,10 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
     // Output mnemonic
     uint16_t i = mcode * MD_MNEMLEN;
     char c = mnem[i + (MD_MNEMLEN - 1)];
-    fprintf(ofd, 
+    OUT(
         "  %07o  %03o  %c%c%c%c", 
         pc, mcode, mnem[i], mnem[i+1], mnem[i+2], mnem[i+3]
-    );
+    )
     pc ++;
 
     // Output parameters of opcode (type indicated by one-character
@@ -101,7 +101,7 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
 
         default :
             // No special type -> print last character of opcode
-            fprintf(ofd, "%c", c);
+            OUT("%c", c)
             break;
     }
 
@@ -111,27 +111,27 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
     {
         case 034 ... 035 :
             // JPB, JPBC
-            fprintf(ofd, "\t; <-[%o]", pc - (int16_t) a1);
+            OUT("\t; <-[%o]", pc - (int16_t) a1)
             break;
             
         case 030 ... 033 :
         case 036 ... 037 :
             // Forward jumps
-            fprintf(ofd, "\t; ->[%o]", pc + (int16_t) a1);
+            OUT("\t; ->[%o]", pc + (int16_t) a1);
             break;
 
         case 0300 :
             // FOR1
-            fprintf(ofd, 
+            OUT(
                 "\t; ->[%o] %s",
                 pc + (int8_t) (a1 & 0xff) - 3,
                 (b1 == 0) ? "UP" : "DN"
-            );
+            )
             break;
 
         case 0301 :
             // FOR2
-            fprintf(ofd, 
+            OUT(
                 "\t; ->[%o]",
                 pc + (int8_t) (a1 & 0xff) - 3
             );
@@ -139,10 +139,10 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
 
 		case 0355 :
 			// CLX
-			fprintf(ofd, "\t; ->%s.%03o", import[a1], b1);
+			OUT("\t; ->%s.%03o", import[a1], b1)
 			break;
     }
 
-    fprintf(ofd, "\n");
+    OUT("\n")
     return ofs;
 }

@@ -70,7 +70,7 @@ void md_decode_file(FILE *infd, FILE *ofd)
             // Start of file
             md_expect(infd, 1);
             vers = md_rword(infd);
-            fprintf(ofd, "HEADER v.%d", vers);
+            OUT("HEADER v.%d", vers)
             break;
         }
         
@@ -79,12 +79,12 @@ void md_decode_file(FILE *infd, FILE *ofd)
             n = md_rword(infd);
 			char modname[MODNAME_LEN];
             md_rname(infd, &modname[0]);
-            fprintf(ofd, "MODULE %s (%d bytes),", &modname, n << 1);
+            OUT("MODULE %s (%d bytes),", &modname, n << 1)
 
-			fprintf(ofd, " key = ");
+			OUT(" key = ")
 			for (int i = 0; i < 3; i ++)
-				fprintf(ofd, "%04X", md_rword(infd));
-			fprintf(ofd, "\n");
+				OUT("%04X", md_rword(infd))
+			OUT("\n")
 
             // Skip bytes following filename in later versions
             if (n == 0x11)
@@ -95,29 +95,29 @@ void md_decode_file(FILE *infd, FILE *ofd)
             decl_data += nd;
             decl_code += nc;
 
-            fprintf(ofd, 
+            OUT(
                 "\n  DataSize: %6d bytes\n"
                 "  CodeSize: %6d bytes\n", 
                 nd, nc
-            );
+            )
             md_rword(infd);
             break;
         }
 
         case 0202 :
             // Import section
-            fprintf(ofd, "IMPORTS\n");
+            OUT("IMPORTS\n")
             n = md_rword(infd);
 			import_n = n;
             a = 1;
             while (n > 0)
             {
                 md_rname(infd, &(import[a][0]));
-                fprintf(ofd, "%4d: %-16s", a, &(import[a][0]));
-				fprintf(ofd, "  (");
+                OUT("%4d: %-16s", a, &(import[a][0]))
+				OUT("  (")
 				for (int i = 0; i < 3; i ++)
-					fprintf(ofd, "%04X", md_rword(infd));
-				fprintf(ofd, ")\n");
+					OUT("%04X", md_rword(infd));
+				OUT(")\n")
 
                 n -= 11;
                 a++;
@@ -129,21 +129,21 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 n = md_rword(infd);
                 a = md_rword(infd);
                 n --;
-                fprintf(ofd, "DATA (%d bytes)\n", n << 1);
+                OUT("DATA (%d bytes)\n", n << 1)
 				total_data += n << 1;
 
                 uint16_t num = 0;
                 while (n-- > 0)
                 {
                     if (num % 8 == 0)
-                        fprintf(ofd, "\n  %07o", a);
+                        OUT("\n  %07o", a)
                     a ++;
                     num ++;
 
                     w = md_rword(infd);
-                    fprintf(ofd, "  %04x", w);
+                    OUT("  %04x", w)
                 }
-                fprintf(ofd, "\n");
+                OUT("\n")
                 break;
             }
 
@@ -155,27 +155,25 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 a = 0;
                 w = md_rword(infd);
 
-                fprintf(ofd, "PROCEDURE #%03o", w);
+                OUT("PROCEDURE #%03o", w)
                 if (n > 2)
                 {
                     uint16_t extra = (n - 2) * 2;
-                    fprintf(ofd, 
-                        "  (%d bytes for extra entries)", extra
-                    );
+                    OUT("  (%d bytes for extra entries)", extra)
                     total_code += (n - 2) * 2;
                 }
-                fprintf(ofd, "\n");
+                OUT("\n")
 
                 while (n-- > 1)
                 {
-                    fprintf(ofd, "%7d: %07o\n", a, md_rword(infd));
+                    OUT("%7d: %07o\n", a, md_rword(infd))
                     a ++;
                 }
             }
             else {
                 n = md_rword(infd) << 1;
                 a = md_rword(infd) << 1;
-                fprintf(ofd, "CODE (%d bytes)\n", n);
+                OUT("CODE (%d bytes)\n", n)
                 total_code += n;
                 n = a + n - 2;
 
@@ -190,13 +188,13 @@ void md_decode_file(FILE *infd, FILE *ofd)
 
         case 0205 :
             // Relocation section
-            fprintf(ofd, "FIXUPS\n");
+            OUT("FIXUPS\n")
             n = md_rword(infd);
 
             while (n-- > 0)
             {
                 w = md_rword(infd);
-                fprintf(ofd, "  %07o\n", w);
+                OUT("  %07o\n", w)
             }
             break;
 
@@ -208,11 +206,11 @@ void md_decode_file(FILE *infd, FILE *ofd)
 
         // End of section
         if (! eof)
-            fprintf(ofd, "\n");
+            OUT("\n")
     };
 
     // Final stats
-    fprintf(ofd,
+    OUT(
         "STATS\n" 
         "  CodeSize: %6d / %6d\n"
 		"  DataSize: %6d / %6d\n"
