@@ -139,7 +139,7 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
 
 		case 0355 :
 			// CLX
-			OUT("\t; ->%s.%03o", import[a1], b1)
+			OUT("\t; ->%s.%d", import[a1], b1)
 			break;
     }
 
