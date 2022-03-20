@@ -47,7 +47,6 @@ void md_decode_file(FILE *infd, FILE *ofd)
     uint16_t vers;
     uint32_t total_code = 0;	// effective code size
     uint32_t decl_code = 0;		// declared code size
-    uint32_t total_data = 0;	// effective data size
 	uint32_t decl_data = 0;		// declared data size
     bool proc_section = true;
     bool eof = false;
@@ -130,7 +129,6 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 a = md_rword(infd);
                 n --;
                 OUT("DATA (%d bytes)\n", n << 1)
-				total_data += n << 1;
 
                 uint16_t num = 0;
                 while (n-- > 0)
@@ -213,9 +211,7 @@ void md_decode_file(FILE *infd, FILE *ofd)
     OUT(
         "STATS\n" 
         "  CodeSize: %6d / %6d\n"
-		"  DataSize: %6d / %6d\n"
 		"  (effective / declared bytes)\n",
-        total_code, decl_code,
-		total_data, decl_data
+        total_code, decl_code
     );
 }

@@ -109,6 +109,11 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
     // Jumps: print offset previously fetched in a1
     switch (mcode)
     {
+		case 022 :
+			// LIW
+			OUT("\t; x%04x", a1)
+			break;
+			
         case 034 ... 035 :
             // JPB, JPBC
             OUT("\t; <-[%o]", pc - (int16_t) a1)
@@ -137,6 +142,11 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
             );
             break;
 
+		case 043 :	// LED 
+		case 063 :	// SED
+		case 027 :	// LEA
+		case 042 :	// LEW
+		case 062 :	// SEW
 		case 0355 :
 			// CLX
 			OUT("\t; ->%s.%d", import[a1], b1)
