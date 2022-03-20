@@ -5,9 +5,6 @@ It is derived from Niklaus Wirth's original decoder which he wrote in 1984 for t
 
 The 1984 version of the decoder is somewhat less complex than an earlier version written by Ch. Jacobi in 1981 for the Modula-2 Multipass Compiler.
 
-## Caveat
-This code is still work in progress. It will already run on most object files, but may not produce the correct output for some of them yet.
-
 ## Compiling And Installation
 1. Download the .tar.gz packages from the "[Releases](https://github.com/good-sushi/m2decode/releases)" page.
 2. Extract and build:
