@@ -210,8 +210,8 @@ void md_decode_file(FILE *infd, FILE *ofd)
     // Final stats
     OUT(
         "STATS\n" 
-        "  CodeSize: %6d / %6d\n"
-		"  (effective / declared bytes)\n",
+        "  CodeSize: %d / %d\n"
+		"  (actual / declared bytes)\n",
         total_code, decl_code
     );
 }
