@@ -129,7 +129,7 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
             // FOR1
             OUT(
                 "\t; ->[%o] %s",
-                pc + (int8_t) (a1 & 0xff) - 3,
+                pc + (int8_t) (a1 & 0xff) + 1,
                 (b1 == 0) ? "UP" : "DN"
             )
             break;
@@ -138,7 +138,7 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
             // FOR2
             OUT(
                 "\t; ->[%o]",
-                pc + (int8_t) (a1 & 0xff) - 3
+                pc + (int8_t) (a1 & 0xff) + 1
             );
             break;
 
