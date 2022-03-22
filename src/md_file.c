@@ -47,7 +47,6 @@ void md_decode_file(FILE *infd, FILE *ofd)
     uint16_t vers;
     uint32_t total_code = 0;	// effective code size
     uint32_t decl_code = 0;		// declared code size
-	uint32_t decl_data = 0;		// declared data size
     bool proc_section = true;
     bool eof = false;
 
@@ -89,13 +88,12 @@ void md_decode_file(FILE *infd, FILE *ofd)
             if (n == 0x11)
                 md_skip(infd, 6);
 
-            uint16_t nd = md_rword(infd) << 1;
+            uint16_t nd = md_rword(infd);
             uint16_t nc = md_rword(infd) << 1;
-            decl_data += nd;
             decl_code += nc;
 
             OUT(
-                "\n  DataSize: %6d bytes\n"
+                "\n  DataSize: %6d words\n"
                 "  CodeSize: %6d bytes\n", 
                 nd, nc
             )
@@ -128,7 +126,7 @@ void md_decode_file(FILE *infd, FILE *ofd)
                 n = md_rword(infd);
                 a = md_rword(infd);
                 n --;
-                OUT("DATA (%d bytes)\n", n << 1)
+                OUT("DATA (%d words)\n", n)
 
                 uint16_t num = 0;
                 while (n-- > 0)
