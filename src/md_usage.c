@@ -18,9 +18,10 @@
 void md_version()
 {
     fprintf(stderr, 
-        PKG " v" PACKAGE_VERSION " (" VERSION_BUILD_DATE ")\n"
-        "Lilith Modula-2 M-Code Disassembler\n\n"
-    );
+    	PACKAGE " v" PACKAGE_VERSION 
+		" by " PACKAGE_BUGREPORT" (" VERSION_BUILD_DATE ")\n"
+		"Modula-2 M-Code Disassembler\n\n"
+	);
 }
 
 
