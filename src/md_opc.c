@@ -142,6 +142,11 @@ uint16_t md_opcode(FILE *infd, FILE *ofd, uint16_t pc, uint8_t mcode)
             );
             break;
 
+		case 0302 :
+			// ENTC
+            OUT("\t; ->[%o]", pc + (int16_t) a1);
+			break;
+			
 		case 043 :	// LED 
 		case 063 :	// SED
 		case 027 :	// LEA
